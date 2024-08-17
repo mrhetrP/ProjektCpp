@@ -77,5 +77,8 @@ class flatsManager {
         void addFlat(const Flat & flat);
         void removeFlat(const Flat & flat);
 
+        void loadFromCSV(const std::string &filename);
+        void saveToCSV(const std::string &filename) const;
+
         void printAll();
 };
