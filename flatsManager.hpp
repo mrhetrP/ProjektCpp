@@ -9,16 +9,31 @@ struct Date {
     int year; // must be between 2000 and 2100
     int month; // must be between 1 and 12
     int day; // must be between 1 and 28/29/30/31
+
+    Date(int y, int m, int d);
+
+    static int daysInMonth(int month, int year);
+    static bool isLeapYear(int year);
 };
 
 struct Address {
     std::string street; 
     int conscriptionNumber; // číslo popisné
-    std::string streetNumber; // číslo orientační (string protože např 1a)
+    std::string streetNumber; // číslo orientační - must be number or number followed by a letter
     std::string city;
     int postCode; // number between 10000 and 99999
+
+    Address(const std::string& street, int conscriptionNumber, const std::string& streetNumber,
+            const std::string& city, int postCode);
+private:
+    bool isValidStreetNumber(const std::string& str);
 };
 
+struct Tenant {
+    std::string name;
+    Date birthDate;
+    Address domicile;
+};
 
 struct Item {
     std::string name;
@@ -28,7 +43,7 @@ struct Item {
 struct Contract {
     Date startDate;
     Date expDate;
-    std::string tenantName;
+    Tenant tenant;
 };
 
 
