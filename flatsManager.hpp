@@ -12,6 +12,7 @@ struct Date {
 
     Date(int y, int m, int d);
 
+private:
     static int daysInMonth(int month, int year);
     static bool isLeapYear(int year);
 };
@@ -23,10 +24,13 @@ struct Address {
     std::string city;
     int postCode; // number between 10000 and 99999
 
-    Address(const std::string& street, int conscriptionNumber, const std::string& streetNumber,
-            const std::string& city, int postCode);
+    Address(const std::string & street, int conscriptionNumber, const std::string & streetNumber,
+            const std::string & city, int postCode);
+
+    bool operator<(const Address & other) const;
+    bool operator==(const Address & other) const;
 private:
-    bool isValidStreetNumber(const std::string& str);
+    bool isValidStreetNumber(const std::string & str);
 };
 
 struct Tenant {
@@ -53,16 +57,16 @@ struct Flat {
     std::vector<Item> items;
     std::vector<Contract> contracts;
 
+    Flat(Address address, int number) : addr(address), number(number) {}
+
     void addItem(const Item& item);
     void removeItem(int id);
 
-    void addContract(const Contract& contract);
-    void removeContract(const std::string& date);
+    void addContract(const Contract & contract);
+    void removeContract(const std::string & date);
 
     std::string simpleDescription() const;
     std::string fullDescription() const;
-
-    bool operator<(const Flat& other) const;
 };
 
 
@@ -70,9 +74,8 @@ class flatsManager {
     public:
         std::vector<Flat> flats;
 
-        void addFlat(const Flat& flat);
-        void removeFlat(const Flat& flat);
-        
-    private:
-        /* data */
+        void addFlat(const Flat & flat);
+        void removeFlat(const Flat & flat);
+
+        void printAll();
 };
