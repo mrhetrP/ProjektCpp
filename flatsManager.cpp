@@ -1,5 +1,44 @@
 # include "flatsManager.hpp"
 
+/*Usage examples:
+    auto allFlats = manager.findFlats();
+    auto flatsOnMainStreet = manager.findFlats("Main Street");
+    auto flatsInPrague = manager.findFlats(std::nullopt, std::nullopt, std::nullopt, "Prague");
+    auto specificFlat = manager.findFlats("Main Street", 123, "45A", "Prague", 11000, 1);
+*/
+std::vector<Flat> flatsManager::findFlats(const std::optional<std::string> & street,
+                                          const std::optional<int> & conscriptionNumber,
+                                          const std::optional<std::string> & streetNumber,
+                                          const std::optional<std::string> & city,
+                                          const std::optional<int> & postCode,
+                                          const std::optional<int> & number,
+                                          const std::optional<std::string> & tenantName) const {
+    std::vector<Flat> results;
+    for (const auto & flat : flats) {
+        bool matches = true;
+
+        if (street && flat.addr.street != *street) matches = false;
+        if (conscriptionNumber && flat.addr.conscriptionNumber != *conscriptionNumber) matches = false;
+        if (streetNumber && flat.addr.streetNumber != *streetNumber) matches = false;
+        if (city && flat.addr.city != *city) matches = false;
+        if (postCode && flat.addr.postCode != *postCode) matches = false;
+        if (number && flat.number != *number) matches = false;
+        if (tenantName) {
+            if (!flat.contracts.empty()) {
+                if (tenantName && flat.contracts.back().tenant.name != *tenantName) matches = false;
+            } else {
+                throw std::invalid_argument("No tenants");
+            }
+        }
+
+        if (matches) {
+            results.push_back(flat);
+        }
+    }
+    std::cout << "Flats found:" << std::endl;
+    return results;
+}
+
 void flatsManager::addFlat (const Flat & flat) {
     // Check if the flat already exists
     auto it = std::lower_bound(flats.begin(), flats.end(), flat.addr, [&](const Flat & f, const Address & addr) {
@@ -9,6 +48,17 @@ void flatsManager::addFlat (const Flat & flat) {
         throw std::invalid_argument("Flat already exists");
     }
     flats.insert(it, flat);
+}
+
+void flatsManager::removeFlat (const Flat & flat) {
+    auto it = std::lower_bound(flats.begin(), flats.end(), flat.addr, [&](const Flat & f, const Address & addr) {
+        return (f.addr < flat.addr || f.number < flat.number);
+    });
+    if (it != flats.end() && it->addr == flat.addr && it->number == flat.number){
+        flats.erase(it);
+        std::cout << "Flat removed successfully" << std::endl;
+    }
+    else throw std::invalid_argument("Flat does not exist");
 }
 
 void flatsManager::printAll () {

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <optional>
 
 struct Date {
     int year; // must be between 2000 and 2100
@@ -73,7 +74,14 @@ struct Flat {
 class flatsManager {
     public:
         std::vector<Flat> flats;
-
+        
+        std::vector<Flat> findFlats(const std::optional<std::string> & street = std::nullopt,
+                                const std::optional<int> & conscriptionNumber = std::nullopt,
+                                const std::optional<std::string> & streetNumber = std::nullopt,
+                                const std::optional<std::string> & city = std::nullopt,
+                                const std::optional<int> & postCode = std::nullopt,
+                                const std::optional<int> & number = std::nullopt,
+                                const std::optional<std::string> & tenantName = std::nullopt) const;
         void addFlat(const Flat & flat);
         void removeFlat(const Flat & flat);
 
