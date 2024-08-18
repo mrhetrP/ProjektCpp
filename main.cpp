@@ -13,11 +13,14 @@ int main (void) {
     Flat flat2(addr2, 1);
     x.addFlat(flat2);
     x.printAll();
+    Item item(12, "xy");
+    flat2.addItem(x, item);
+    std::cout << flat2.items.back().id << std::endl;
 
     //x.removeFlat(flat2);
-    auto flatsOnMainStreet = x.findFlats("Blanická");
+    //auto flatsOnMainStreet = x.findFlats("Blanická");
 
-    //x.saveToCSV("flats.csv");
+    x.saveToCSV("flats.csv");
     //x.loadFromCSV("flats.csv");
     x.printAll();
     return EXIT_SUCCESS;

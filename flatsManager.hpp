@@ -41,8 +41,10 @@ struct Tenant {
 };
 
 struct Item {
-    std::string name;
     int id;
+    std::string name;
+
+    Item(int id, const std::string & name) : id(id), name(name) {}
 };
 
 struct Contract {
@@ -51,7 +53,7 @@ struct Contract {
     Tenant tenant;
 };
 
-
+class flatsManager;
 struct Flat {
     Address addr;
     int number;
@@ -60,11 +62,11 @@ struct Flat {
 
     Flat(Address address, int number) : addr(address), number(number) {}
 
-    void addItem(const Item& item);
+    void addItem(flatsManager & manager, const Item & item);
     void removeItem(int id);
 
     void addContract(const Contract & contract);
-    void removeContract(const std::string & date);
+    void removeContract(const Contract & contract);
 
     std::string simpleDescription() const;
     std::string fullDescription() const;
@@ -88,5 +90,5 @@ class flatsManager {
         void loadFromCSV(const std::string &filename);
         void saveToCSV(const std::string &filename) const;
 
-        void printAll();
+        void printAll(); //TODO rewrite
 };

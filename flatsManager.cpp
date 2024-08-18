@@ -106,7 +106,7 @@ void flatsManager::loadFromCSV(const std::string &filename) {
             int id;
             std::getline(itemStream, name, ':');
             itemStream >> id;
-            items.push_back({name, id});
+            items.push_back({id, name});
         }
 
         // Contracts
