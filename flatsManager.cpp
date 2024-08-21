@@ -35,7 +35,6 @@ std::vector<Flat> flatsManager::findFlats(const std::optional<std::string> & str
             results.push_back(flat);
         }
     }
-    std::cout << "Flats found:" << std::endl;
     return results;
 }
 
@@ -65,6 +64,10 @@ void flatsManager::printAll () {
     for (const auto & flat : flats) {
         std::cout << "Address: " << flat.addr.city << " " << flat.addr.street << " " << flat.addr.conscriptionNumber << "/" << flat.addr.streetNumber << std::endl;
         std::cout << "Flat number: " << flat.number << std::endl;
+        std::cout << "Items: " << std::endl;
+        for (const auto & item : flat.items) {
+            std::cout << "\t" << item.id << " " << item.name << std::endl;
+        }
         std::cout << std::endl;
     }
 }
@@ -106,7 +109,7 @@ void flatsManager::loadFromCSV(const std::string &filename) {
             int id;
             std::getline(itemStream, name, ':');
             itemStream >> id;
-            items.push_back({id, name});
+            items.push_back({name, id});
         }
 
         // Contracts

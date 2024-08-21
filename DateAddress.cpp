@@ -16,6 +16,20 @@ Date::Date(int y, int m, int d) {
     day = d;
 }
 
+bool Date::operator<(const Date &other) const {
+    if (year < other.year) {
+        return true;
+    } else if (year > other.year) {
+        return false;
+    } 
+    if (month < other.month) {
+        return true;
+    } else if (month > other.month) {
+        return false;
+    } 
+    return day < other.day;
+}
+
 int Date::daysInMonth(int month, int year) {
     if (month == 2) { // February
         return (isLeapYear(year) ? 29 : 28);

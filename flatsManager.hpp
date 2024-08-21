@@ -13,6 +13,8 @@ struct Date {
 
     Date(int y, int m, int d);
 
+    bool operator<(const Date & other) const;
+
 private:
     static int daysInMonth(int month, int year);
     static bool isLeapYear(int year);
@@ -38,19 +40,25 @@ struct Tenant {
     std::string name;
     Date birthDate;
     Address domicile;
+
+    Tenant(const std::string & name, Date birthDate, Address domicile)
+         : name(name), birthDate(birthDate), domicile(domicile) {};
 };
 
 struct Item {
-    int id;
     std::string name;
+    int id;
 
-    Item(int id, const std::string & name) : id(id), name(name) {}
+    Item(const std::string & name, int id) : name(name), id(id) {}
 };
 
 struct Contract {
     Date startDate;
     Date expDate;
     Tenant tenant;
+
+    Contract(Date startDate, Date expDate, Tenant tenant)
+        : startDate(startDate), expDate(expDate), tenant(tenant) {}
 };
 
 class flatsManager;

@@ -10,10 +10,19 @@ void Flat::addItem(flatsManager & manager, const Item & item) {
             throw std::invalid_argument("An item with the same ID already exists in a flat at this address");
         }
     }
-    items.push_back(item);
+    auto it = std::lower_bound(this->items.begin(), this->items.end(), item.id, [&](const Item & i, const int & id) {
+        return (i.id < item.id);
+    });
+    items.insert(it, item);
 }
 
 //void Flat::removeItem(int id);
 
-//void Flat::addContract(const Contract & contract);
+void Flat::addContract(const Contract & contract) {
+    auto it = std::lower_bound(this->contracts.begin(), this->contracts.end(), contract.startDate, [&](const Contract & c, const Date & date) {
+        return (c.startDate < contract.startDate);
+    });
+    contracts.insert(it, contract);
+}
+
 //void Flat::removeContract(const Contract & contract);
