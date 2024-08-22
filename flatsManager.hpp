@@ -14,6 +14,7 @@ struct Date {
     Date(int y, int m, int d);
 
     bool operator<(const Date & other) const;
+    bool operator==(const Date & other) const;
 
 private:
     static int daysInMonth(int month, int year);
@@ -59,6 +60,10 @@ struct Contract {
 
     Contract(Date startDate, Date expDate, Tenant tenant)
         : startDate(startDate), expDate(expDate), tenant(tenant) {}
+
+    bool operator==(const Contract &other) const {
+        return startDate == other.startDate && expDate == other.expDate && tenant.name == other.tenant.name;
+    }
 };
 
 class flatsManager;

@@ -68,6 +68,10 @@ void flatsManager::printAll () {
         for (const auto & item : flat.items) {
             std::cout << "\t" << item.id << " " << item.name << std::endl;
         }
+        std::cout << "Contracts: " << std::endl;
+        for (const auto & contract : flat.contracts) {
+            std::cout << "\t" << contract.startDate.month << "/" << contract.startDate.year << " - " << contract.expDate.month << "/" << contract.expDate.year << std::endl;
+        }
         std::cout << std::endl;
     }
 }

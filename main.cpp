@@ -18,7 +18,11 @@ int main (void) {
     x.flats.back().addItem(x, Item("yz", 12));
     Date date(2015, 5, 12);
     x.flats.back().addContract(Contract(date, date, Tenant("name1", date, addr1)));
-
+    x.flats.back().addContract(Contract(Date(2016, 3, 12), Date(2016, 5, 12), Tenant("name1", date, addr1)));
+    x.printAll();
+    
+    x.flats.back().removeItem(12);
+    x.flats.back().removeContract(Contract(Date(2016, 3, 12), Date(2016, 5, 12), Tenant("name1", date, addr1)));
     //x.removeFlat(flat2);
     //auto flatsOnMainStreet = x.findFlats("Blanická");
 
