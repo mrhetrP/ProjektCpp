@@ -56,7 +56,7 @@ Address::Address (const std::string & street, int conscriptionNumber, const std:
         throw std::invalid_argument("Street number must be a number or a number followed by a letter.");
     }
     if (postCode < 10000 || postCode > 99999) {
-        throw std::out_of_range("Post code must be in formate nnnnn.");
+        throw std::invalid_argument("Post code must be in formate nnnnn.");
     }
     this->street = street;
     this->conscriptionNumber = conscriptionNumber;

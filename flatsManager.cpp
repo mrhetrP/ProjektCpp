@@ -6,7 +6,7 @@
     auto flatsInPrague = manager.findFlats(std::nullopt, std::nullopt, std::nullopt, "Prague");
     auto specificFlat = manager.findFlats("Main Street", 123, "45A", "Prague", 11000, 1);
 */
-std::vector<Flat> flatsManager::findFlats(const std::optional<std::string> & street,
+std::vector<Flat> FlatsManager::findFlats(const std::optional<std::string> & street,
                                           const std::optional<int> & conscriptionNumber,
                                           const std::optional<std::string> & streetNumber,
                                           const std::optional<std::string> & city,
@@ -38,7 +38,7 @@ std::vector<Flat> flatsManager::findFlats(const std::optional<std::string> & str
     return results;
 }
 
-void flatsManager::addFlat (const Flat & flat) {
+void FlatsManager::addFlat (const Flat & flat) {
     // Check if the flat already exists
     auto it = std::lower_bound(flats.begin(), flats.end(), flat.addr, [&](const Flat & f, const Address & addr) {
         return (f.addr < flat.addr || f.number < flat.number);
@@ -49,7 +49,7 @@ void flatsManager::addFlat (const Flat & flat) {
     flats.insert(it, flat);
 }
 
-void flatsManager::removeFlat (const Flat & flat) {
+void FlatsManager::removeFlat (const Flat & flat) {
     auto it = std::lower_bound(flats.begin(), flats.end(), flat.addr, [&](const Flat & f, const Address & addr) {
         return (f.addr < flat.addr || f.number < flat.number);
     });
@@ -60,7 +60,8 @@ void flatsManager::removeFlat (const Flat & flat) {
     else throw std::invalid_argument("Flat does not exist");
 }
 
-void flatsManager::printAllSimple () {
+void FlatsManager::printAllSimple () {
+    std::cout << std::endl;
     std::cout << std::left << std::setw(40) << "Address:";
     std::cout << std::left << std::setw(20) << "| Flat number:";
     std::cout << std::left << std::setw(20) << "| Number of items:";
@@ -72,7 +73,8 @@ void flatsManager::printAllSimple () {
     }
 }
 
-void flatsManager::printAllFull () {
+void FlatsManager::printAllFull () {
+    std::cout << std::endl;
     std::cout << std::left << std::setw(40) << "Address:";
     std::cout << std::left << std::setw(17) << "| Flat number:";
     std::cout << std::left << std::setw(20) << "| Items:";
@@ -85,7 +87,7 @@ void flatsManager::printAllFull () {
     }
 }
 
-void flatsManager::loadFromCSV(const std::string &filename) {
+void FlatsManager::loadFromCSV(const std::string &filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {
         throw std::runtime_error("Unable to open file");
@@ -130,7 +132,7 @@ void flatsManager::loadFromCSV(const std::string &filename) {
         std::getline(lineStream, token, ',');
         if (!token.empty() && token[0] == '\"') token = token.substr(1, token.size() - 2);
         std::stringstream contractsStream(token);
-        std::string contractToken;
+        std::string contractToken = "";
         while (std::getline(contractsStream, contractToken, ';')) {
             std::stringstream contractStream(contractToken);
             int sy, sm, sd, ey, em, ed;
@@ -152,11 +154,11 @@ void flatsManager::loadFromCSV(const std::string &filename) {
             std::getline(contractStream, token, '-'); bm = std::stoi(token);
             std::getline(contractStream, token, ':'); bd = std::stoi(token);
 
-            std::getline(contractStream, tenantStreet, ',');
-            std::getline(contractStream, token, ','); tenantConscriptionNumber = std::stoi(token);
-            std::getline(contractStream, tenantStreetNumber, ',');
-            std::getline(contractStream, tenantCity, ',');
-            std::getline(contractStream, token, ','); tenantPostCode = std::stoi(token);
+            std::getline(contractStream, tenantStreet, '.');
+            std::getline(contractStream, token, '.'); tenantConscriptionNumber = std::stoi(token);
+            std::getline(contractStream, tenantStreetNumber, '.');
+            std::getline(contractStream, tenantCity, '.');
+            std::getline(contractStream, token, '.'); tenantPostCode = std::stoi(token);
 
             Date startDate(sy, sm, sd);
             Date expDate(ey, em, ed);
@@ -173,7 +175,7 @@ void flatsManager::loadFromCSV(const std::string &filename) {
     file.close();
 }
 
-void flatsManager::saveToCSV(const std::string &filename) const {
+void FlatsManager::saveToCSV(const std::string &filename) const {
     std::ofstream file(filename);
     if (!file.is_open()) {
         throw std::runtime_error("Unable to open file");
@@ -206,8 +208,8 @@ void flatsManager::saveToCSV(const std::string &filename) const {
                             << contract.expDate.year << "-" << contract.expDate.month << "-" << contract.expDate.day << ":"
                             << contract.tenant.name << ":"
                             << contract.tenant.birthDate.year << "-" << contract.tenant.birthDate.month << "-" << contract.tenant.birthDate.day << ":"
-                            << contract.tenant.domicile.street << "," << contract.tenant.domicile.conscriptionNumber << ","
-                            << contract.tenant.domicile.streetNumber << "," << contract.tenant.domicile.city << ","
+                            << contract.tenant.domicile.street << "." << contract.tenant.domicile.conscriptionNumber << "."
+                            << contract.tenant.domicile.streetNumber << "." << contract.tenant.domicile.city << "."
                             << contract.tenant.domicile.postCode << ";";
         }
         std::string contracts = contractsStream.str();

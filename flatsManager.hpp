@@ -67,7 +67,7 @@ struct Contract {
     }
 };
 
-class flatsManager;
+class FlatsManager;
 struct Flat {
     Address addr;
     int number;
@@ -76,7 +76,7 @@ struct Flat {
 
     Flat(Address address, int number) : addr(address), number(number) {}
 
-    void addItem(flatsManager & manager, const Item & item);
+    void addItem(FlatsManager & manager, const Item & item);
     void removeItem(int id);
 
     void addContract(const Contract & contract);
@@ -87,7 +87,7 @@ struct Flat {
 };
 
 
-class flatsManager {
+class FlatsManager {
     public:
         std::vector<Flat> flats;
         

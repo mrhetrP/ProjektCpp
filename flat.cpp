@@ -1,6 +1,6 @@
 # include "flatsManager.hpp"
 
-void Flat::addItem(flatsManager & manager, const Item & item) {
+void Flat::addItem(FlatsManager & manager, const Item & item) {
     std::vector<Flat> flatsAtSameAddress = manager.findFlats(addr.street, addr.conscriptionNumber, addr.streetNumber, addr.city, addr.postCode);
     for (const auto &flat : flatsAtSameAddress) {
         auto it = std::find_if(flat.items.begin(), flat.items.end(), [&item](const Item &existingItem) {
@@ -65,7 +65,7 @@ void Flat::removeContract(const Contract &contract) {
 }
 
 void Flat::simpleDescription() const {
-    std::cout << std::left << std::setw(41) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
+    std::cout << std::left << std::setw(40) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
         + this->addr.streetNumber + ", " + this->addr.city + ", " + std::to_string(this->addr.postCode));
     std::cout << std::left << std::setw(20) << ("| " + std::to_string(this->number));
     if (!this->items.empty()) {
@@ -83,7 +83,7 @@ void Flat::simpleDescription() const {
 
 void Flat::fullDescription() const {
     // First line
-    std::cout << std::left << std::setw(41) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
+    std::cout << std::left << std::setw(40) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
         + this->addr.streetNumber + ", " + this->addr.city + ", " + std::to_string(this->addr.postCode));
     std::cout << std::left << std::setw(17) << ("| " + std::to_string(this->number));
     if (!this->items.empty() && !this->contracts.empty()) {
