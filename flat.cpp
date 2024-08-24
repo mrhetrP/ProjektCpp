@@ -55,7 +55,6 @@ void Flat::removeContract(const Contract &contract) {
     auto it = std::find_if(contracts.begin(), contracts.end(), [&](const Contract &c) {
         return c == contract;
     });
-
     // If the contract is found, remove it
     if (it != contracts.end()) {
         contracts.erase(it);
@@ -63,4 +62,21 @@ void Flat::removeContract(const Contract &contract) {
         // If the contract does not exist, throw an exception or handle the error
         throw std::invalid_argument("The specified contract does not exist");
     }
+}
+
+void Flat::simpleDescription() const {
+    std::cout << std::left << std::setw(41) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
+        + this->addr.streetNumber + ", " + this->addr.city + ", " + std::to_string(this->addr.postCode));
+    std::cout << std::left << std::setw(20) << ("| " + std::to_string(this->number));
+    if (!this->items.empty()) {
+        std::cout << std::left << std::setw(20) << ("| " + std::to_string(this->items.size()));
+    } else {
+        std::cout << std::left << std::setw(20) << "| 0";
+    }
+    if (!this->contracts.empty()) {
+        std::cout << std::left << std::setw(20) << ("| " + this->contracts.back().tenant.name);
+    } else {
+        std::cout << std::left << std::setw(20) << "| no contracts";
+    }
+    std::cout << std::endl;
 }

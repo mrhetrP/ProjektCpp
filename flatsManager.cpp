@@ -60,19 +60,15 @@ void flatsManager::removeFlat (const Flat & flat) {
     else throw std::invalid_argument("Flat does not exist");
 }
 
-void flatsManager::printAll () {
+void flatsManager::printAllSimple () {
+    std::cout << std::left << std::setw(40) << "Address:";
+    std::cout << std::left << std::setw(20) << "| Flat number:";
+    std::cout << std::left << std::setw(20) << "| Number of items:";
+    std::cout << std::left << std::setw(20) << "| Latest tenant:";
+    std::cout << std::endl;
+    std::cout << std::string(40, '-') + "+" + std::string(19, '-') + "+" + std::string(19, '-') + "+" + std::string(19, '-') << std::endl;
     for (const auto & flat : flats) {
-        std::cout << "Address: " << flat.addr.city << " " << flat.addr.street << " " << flat.addr.conscriptionNumber << "/" << flat.addr.streetNumber << std::endl;
-        std::cout << "Flat number: " << flat.number << std::endl;
-        std::cout << "Items: " << std::endl;
-        for (const auto & item : flat.items) {
-            std::cout << "\t" << item.id << " " << item.name << std::endl;
-        }
-        std::cout << "Contracts: " << std::endl;
-        for (const auto & contract : flat.contracts) {
-            std::cout << "\t" << contract.startDate.month << "/" << contract.startDate.year << " - " << contract.expDate.month << "/" << contract.expDate.year << std::endl;
-        }
-        std::cout << std::endl;
+        flat.simpleDescription();
     }
 }
 

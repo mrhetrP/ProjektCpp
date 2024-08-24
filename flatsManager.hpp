@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -81,8 +82,8 @@ struct Flat {
     void addContract(const Contract & contract);
     void removeContract(const Contract & contract);
 
-    std::string simpleDescription() const;
-    std::string fullDescription() const;
+    void simpleDescription() const;
+    void fullDescription() const;
 };
 
 
@@ -103,5 +104,5 @@ class flatsManager {
         void loadFromCSV(const std::string &filename);
         void saveToCSV(const std::string &filename) const;
 
-        void printAll(); //TODO rewrite
+        void printAllSimple(); //TODO rewrite
 };
