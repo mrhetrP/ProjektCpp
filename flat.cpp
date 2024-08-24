@@ -80,3 +80,54 @@ void Flat::simpleDescription() const {
     }
     std::cout << std::endl;
 }
+
+void Flat::fullDescription() const {
+    // First line
+    std::cout << std::left << std::setw(41) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
+        + this->addr.streetNumber + ", " + this->addr.city + ", " + std::to_string(this->addr.postCode));
+    std::cout << std::left << std::setw(17) << ("| " + std::to_string(this->number));
+    if (!this->items.empty() && !this->contracts.empty()) {
+        std::cout << std::left << std::setw(20) << ("| " + std::to_string(this->items.front().id) + ", " + this->items.front().name);
+        std::cout << std::left << std::setw(35) << ("| " + std::to_string(this->contracts.front().startDate.month) + "/" + std::to_string(this->contracts.front().startDate.year)
+            + " - " + std::to_string(this->contracts.front().expDate.month) + "/" + std::to_string(this->contracts.front().expDate.year) + " " + this->contracts.front().tenant.name);
+    } else if (this->items.empty() && !this->contracts.empty()) {
+        std::cout << std::left << std::setw(20) << "| no items";
+        std::cout << std::left << std::setw(35) << ("| " + std::to_string(this->contracts.front().startDate.month) + "/" + std::to_string(this->contracts.front().startDate.year)
+            + " - " + std::to_string(this->contracts.front().expDate.month) + "/" + std::to_string(this->contracts.front().expDate.year) + " " + this->contracts.front().tenant.name);
+    } else if (this->items.empty() && !this->contracts.empty()) {
+        std::cout << std::left << std::setw(20) << ("| " + std::to_string(this->items.front().id) + ", " + this->items.front().name);
+        std::cout << std::left << std::setw(35) << "| no contracts";
+    } else {
+        std::cout << std::left << std::setw(20) << "| no items";
+        std::cout << std::left << std::setw(35) << "| no contracts";
+    }
+    std::cout << std::endl;
+
+    // Other lines
+    auto contract = this->contracts.begin();
+    if (!this->contracts.empty()) ++contract;
+
+    auto item = this->items.size() > 1 ? this->items.begin() + 1 : this->items.end();
+
+    while (item != this->items.end() || contract != this->contracts.end()) {
+        std::cout << std::string(40, ' ') << std::string(17, ' ');
+
+        if (item != this->items.end()) {
+            std::cout << std::left << std::setw(20) << ("| " + std::to_string(item->id) + ", " + item->name);
+            ++item;
+        } else {
+            std::cout << std::left << std::setw(20) << "|";
+        }
+
+        if (contract != this->contracts.end()) {
+            std::cout << std::left << std::setw(35) 
+                      << ("| " + std::to_string(contract->startDate.month) + "/" + std::to_string(contract->startDate.year)
+                          + " - " + std::to_string(contract->expDate.month) + "/" + std::to_string(contract->expDate.year) + " " + contract->tenant.name);
+            ++contract;
+        } else {
+            std::cout << std::left << std::setw(35) << "|";
+        }
+
+        std::cout << std::endl;
+    }
+}

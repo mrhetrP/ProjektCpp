@@ -104,5 +104,6 @@ class flatsManager {
         void loadFromCSV(const std::string &filename);
         void saveToCSV(const std::string &filename) const;
 
-        void printAllSimple(); //TODO rewrite
+        void printAllSimple();
+        void printAllFull();
 };

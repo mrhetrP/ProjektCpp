@@ -72,6 +72,19 @@ void flatsManager::printAllSimple () {
     }
 }
 
+void flatsManager::printAllFull () {
+    std::cout << std::left << std::setw(40) << "Address:";
+    std::cout << std::left << std::setw(17) << "| Flat number:";
+    std::cout << std::left << std::setw(20) << "| Items:";
+    std::cout << std::left << std::setw(35) << "| Contracts";
+    std::cout << std::endl;
+    std::cout << std::string(40, '-') + "+" + std::string(16, '-') + "+" + std::string(19, '-') + "+" + std::string(34, '-') << std::endl;
+    for (const auto & flat : flats) {
+        flat.fullDescription();
+        std::cout << std::endl;
+    }
+}
+
 void flatsManager::loadFromCSV(const std::string &filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {
