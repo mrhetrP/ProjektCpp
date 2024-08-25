@@ -31,7 +31,6 @@ void Flat::addContract(const Contract & contract) {
     if (contract.expDate < contract.startDate) {
         throw std::invalid_argument("New contract expDate is earlier than startDate");
     }
-    // Find the correct position to insert the contract based on startDate
     auto it = std::lower_bound(this->contracts.begin(), this->contracts.end(), contract.startDate, 
         [](const Contract & c, const Date & date) {
             return c.startDate < date;
@@ -55,11 +54,9 @@ void Flat::removeContract(const Contract &contract) {
     auto it = std::find_if(contracts.begin(), contracts.end(), [&](const Contract &c) {
         return c == contract;
     });
-    // If the contract is found, remove it
     if (it != contracts.end()) {
         contracts.erase(it);
     } else {
-        // If the contract does not exist, throw an exception or handle the error
         throw std::invalid_argument("The specified contract does not exist");
     }
 }

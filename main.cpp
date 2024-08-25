@@ -13,7 +13,7 @@ int main (void) {
     Address addr2("Blanicka", 1256, "123B", "Prag", 12346);
     Flat flat2(addr2, 2);
     x.addFlat(flat2);
-    x.printAllSimple();
+    //x.printAllSimple();
     Item item("xy", 15);
     x.flats.back().addItem(x, item);
     x.flats.back().addItem(x, Item("yz", 12));
@@ -29,7 +29,7 @@ int main (void) {
 
     x.saveToCSV("flats.csv");
     
-    x.loadFromCSV("flats.csv");
+    //x.loadFromCSV("flats.csv");
     x.printAllFull();
     return EXIT_SUCCESS;
 }
@@ -61,6 +61,55 @@ void addFlat(FlatsManager & manager) {
             manager.addFlat(flat);
             clear();
             mvprintw(0, 0, "Flat added successfully. Press any key to return to the main menu.");
+            // TO DO add contract?
+            // TO DO add item?
+            success = true; // Break the loop on success
+            getch();
+            clear();
+            refresh();
+        } catch (const std::invalid_argument& e) {
+            clear();
+            mvprintw(0, 0, "Error: %s", e.what());
+            mvprintw(1, 0, "Do you want to try again? (y/n): ");
+            char response = getch();
+            if (response != 'y' && response != 'Y') {
+                mvprintw(3, 0, "Operation cancelled. Press any key to return to the main menu.");
+                getch();
+                success = true; // Break the loop to exit
+            }
+            clear();
+            refresh();
+        }
+    }
+}
+
+void removeFlat(FlatsManager & manager) {
+    char street[50], city[50], streetNumber[10];
+    int conscriptionNumber, postCode, flatNumber;
+    bool success = false;
+
+    while (!success) {
+        echo();
+        mvprintw(0, 0, "Enter Street Name: ");
+        getstr(street);
+        mvprintw(1, 0, "Enter Conscription Number: ");
+        scanw("%d", &conscriptionNumber);
+        mvprintw(2, 0, "Enter Street Number: ");
+        getstr(streetNumber);
+        mvprintw(3, 0, "Enter City: ");
+        getstr(city);
+        mvprintw(4, 0, "Enter Postcode: ");
+        scanw("%d", &postCode);
+        mvprintw(5, 0, "Enter Flat Number: ");
+        scanw("%d", &flatNumber);
+
+        
+        try {
+            Address addr(street, conscriptionNumber, streetNumber, city, postCode);
+            Flat flat(addr, flatNumber);
+            manager.removeFlat(flat);
+            clear();
+            mvprintw(0, 0, "Flat removed successfully. Press any key to return to the main menu.");
             success = true; // Break the loop on success
             getch();
             clear();
@@ -99,7 +148,6 @@ void loadFromCSV(FlatsManager &manager) {
     echo(); // Enable echoing of user input
     curs_set(1); // Show cursor to indicate input is expected
 
-    // Ask for the file name
     mvprintw(0, 0, "Enter File Name: ");
     getstr(file); // Get the file name from the user
 
@@ -117,6 +165,25 @@ void loadFromCSV(FlatsManager &manager) {
     // File exists, proceed with loading
     manager.loadFromCSV(file);
     mvprintw(2, 0, "Flats loaded successfully! Press any key to return to the menu.");
+    getch(); // Wait for the user to press a key
+    clear(); // Clear the screen
+
+    noecho(); // Disable echoing of user input
+    curs_set(0); // Hide cursor
+    clear();
+    refresh();
+}
+
+void saveToCSV(FlatsManager &manager) {
+    char file[100];
+    echo(); // Enable echoing of user input
+    curs_set(1); // Show cursor to indicate input is expected
+
+    mvprintw(0, 0, "Enter File Name: ");
+    getstr(file);
+
+    manager.saveToCSV(file);
+    mvprintw(2, 0, "Flats saved to %s successfully! Press any key to return to the menu.", file);
     getch(); // Wait for the user to press a key
     clear(); // Clear the screen
 
@@ -156,7 +223,7 @@ void handleMenuSelection(int choice, FlatsManager &manager) {
             addFlat(manager);
             break;
         case 1:
-            //removeFlat(manager);
+            removeFlat(manager);
             break;
         case 2:
             //findFlat(manager);
@@ -171,7 +238,7 @@ void handleMenuSelection(int choice, FlatsManager &manager) {
             loadFromCSV(manager);
             break;
         case 6:
-            //saveToCSV;
+            saveToCSV(manager);
             break;
         case 7:
             // Exit the program
@@ -186,7 +253,7 @@ int main() {
     keypad(stdscr, TRUE); // Enable special keys like arrow keys
     curs_set(0); // Hide the cursor
 
-    FlatsManager manager; // Create the FlatsManager instance
+    FlatsManager manager;
 
     int highlight = 0;
     int choice = 0;

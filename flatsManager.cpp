@@ -27,7 +27,7 @@ std::vector<Flat> FlatsManager::findFlats(const std::optional<std::string> & str
             if (!flat.contracts.empty()) {
                 if (tenantName && flat.contracts.back().tenant.name != *tenantName) matches = false;
             } else {
-                throw std::invalid_argument("No tenants");
+                matches = false;
             }
         }
 
@@ -39,7 +39,6 @@ std::vector<Flat> FlatsManager::findFlats(const std::optional<std::string> & str
 }
 
 void FlatsManager::addFlat (const Flat & flat) {
-    // Check if the flat already exists
     auto it = std::lower_bound(flats.begin(), flats.end(), flat.addr, [&](const Flat & f, const Address & addr) {
         return (f.addr < flat.addr || f.number < flat.number);
     });
@@ -55,9 +54,7 @@ void FlatsManager::removeFlat (const Flat & flat) {
     });
     if (it != flats.end() && it->addr == flat.addr && it->number == flat.number){
         flats.erase(it);
-        std::cout << "Flat removed successfully" << std::endl;
-    }
-    else throw std::invalid_argument("Flat does not exist");
+    } else throw std::invalid_argument("Flat does not exist");
 }
 
 void FlatsManager::printAllSimple () {
@@ -115,7 +112,7 @@ void FlatsManager::loadFromCSV(const std::string &filename) {
         // Items
         std::vector<Item> items;
         std::getline(lineStream, token, ',');
-        if (!token.empty() && token[0] == '\"') token = token.substr(1, token.size() - 2);
+        if (!token.empty() && token[0] == '\"') token = token.substr(1, token.size() - 2);  // remove quotes
         std::stringstream itemsStream(token);
         std::string itemToken;
         while (std::getline(itemsStream, itemToken, ';')) {
