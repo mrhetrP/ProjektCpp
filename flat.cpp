@@ -65,11 +65,7 @@ void Flat::simpleDescription() const {
     std::cout << std::left << std::setw(40) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
         + this->addr.streetNumber + ", " + this->addr.city + ", " + std::to_string(this->addr.postCode));
     std::cout << std::left << std::setw(20) << ("| " + std::to_string(this->number));
-    if (!this->items.empty()) {
-        std::cout << std::left << std::setw(20) << ("| " + std::to_string(this->items.size()));
-    } else {
-        std::cout << std::left << std::setw(20) << "| 0";
-    }
+    std::cout << std::left << std::setw(20) << ("| " + std::to_string(this->items.size()));
     if (!this->contracts.empty()) {
         std::cout << std::left << std::setw(20) << ("| " + this->contracts.back().tenant.name);
     } else {

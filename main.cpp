@@ -132,15 +132,62 @@ void removeFlat(FlatsManager & manager) {
 
 void listFlatsSimple(std::vector<Flat> flats) {
     clear();
-    std::cout << std::left << std::setw(40) << "Address:";
-    std::cout << std::left << std::setw(20) << "| Flat number:";
-    std::cout << std::left << std::setw(20) << "| Number of items:";
-    std::cout << std::left << std::setw(20) << "| Latest tenant:";
-    std::cout << std::endl;
-    std::cout << std::string(40, '-') + "+" + std::string(19, '-') + "+" + std::string(19, '-') + "+" + std::string(19, '-') << std::endl;
+    refresh();
+    mvprintw(0, 0, "%ld flats:", flats.size());
+    mvprintw(3, 0, "Address:");                         mvprintw(3, 40, "| Flat number:");                    mvprintw(3, 60, "| Number of items:");                mvprintw(3, 80, "| Latest tenant:");
+    mvprintw(4, 0, "%s", std::string(40, '-').c_str()); mvprintw(4, 40, "+%s", std::string(29, '-').c_str()); mvprintw(4, 60, "+%s", std::string(29, '-').c_str()); mvprintw(4, 80, "+%s", std::string(29, '-').c_str());
+    int line = 5;
     for (const auto & flat : flats) {
-        flat.simpleDescription();
+        mvprintw(line, 0, "%s %d/%s, %s, %d", flat.addr.street.c_str(), flat.addr.conscriptionNumber, flat.addr.streetNumber.c_str(), flat.addr.city.c_str(), flat.addr.postCode);
+        mvprintw(line, 40, "| %d", flat.number);    mvprintw(line, 60, "| %ld", flat.items.size());
+        if (!flat.contracts.empty()) {
+            mvprintw(line, 80, "| %s", flat.contracts.back().tenant.name.c_str());
+        } else {
+            mvprintw(line, 80, "| no contracts");
+        }
+        line += 2;
     }
+    refresh();
+}
+
+void listFlatsFull(std::vector<Flat> flats) {
+    clear();
+    refresh();
+    mvprintw(0, 0, "%ld flats:", flats.size());
+    mvprintw(3, 0, "Address:");                         mvprintw(3, 40, "| Flat number:");                    mvprintw(3, 57, "| Items:");                mvprintw(3, 77, "| Contracts:");
+    mvprintw(4, 0, "%s", std::string(40, '-').c_str()); mvprintw(4, 40, "+%s", std::string(16, '-').c_str()); mvprintw(4, 57, "+%s", std::string(19, '-').c_str()); mvprintw(4, 77, "+%s", std::string(34, '-').c_str());
+    int line = 5;
+    for (const auto & flat : flats) {
+        // first line
+        mvprintw(line, 0, "%s %d/%s, %s, %d", flat.addr.street.c_str(), flat.addr.conscriptionNumber, flat.addr.streetNumber.c_str(), flat.addr.city.c_str(), flat.addr.postCode);
+        mvprintw(line, 40, "| %d", flat.number);
+        if (!flat.items.empty()) {
+            mvprintw(line, 57, "| %d, %s", flat.items.front().id, flat.items.front().name.c_str());
+        } else {
+            mvprintw(line, 57, "| no items");
+        }
+        if (!flat.contracts.empty()) {
+            mvprintw(line, 77, "| %d/%d - %d/%d %s", flat.contracts.front().startDate.month, flat.contracts.front().startDate.year, flat.contracts.front().expDate.month, flat.contracts.front().expDate.year, flat.contracts.front().tenant.name.c_str());
+        } else {
+            mvprintw(line, 77, "| no contracts");
+        }
+        // other lines
+        int itemLine = line +1;
+        for (const auto & item : flat.items) {
+            mvprintw(itemLine, 40, "|");
+            mvprintw(itemLine, 57, "| %d, %s", item.id, item.name.c_str());
+        }
+        int contrLine = line +1;
+        for (const auto & contract : flat.contracts) {
+            mvprintw(contrLine, 40, "|");
+            mvprintw(contrLine, 77, "| %d/%d - %d/%d %s", contract.startDate.month, contract.startDate.year, contract.expDate.month, contract.expDate.year, contract.tenant.name.c_str());
+        }
+        line = itemLine > contrLine ? itemLine : contrLine;
+        if (flat.items.size() > 1 || flat.contracts.size() > 1) line++;
+        mvprintw(line, 40, "|"); mvprintw(line, 57, "|"); mvprintw(line, 77, "|");
+        line++;
+    }
+    refresh();
 }
 
 void loadFromCSV(FlatsManager &manager) {
@@ -232,7 +279,7 @@ void handleMenuSelection(int choice, FlatsManager &manager) {
             listFlatsSimple(manager.flats);
             break;
         case 4:
-            //listFlatsFull(manager.flats);
+            listFlatsFull(manager.flats);
             break;
         case 5:
             loadFromCSV(manager);
