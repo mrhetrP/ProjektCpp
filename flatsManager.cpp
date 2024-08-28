@@ -13,8 +13,8 @@ std::vector<Flat*> FlatsManager::findFlats(const std::optional<std::string> & st
                                            const std::optional<int> & postCode,
                                            const std::optional<int> & number,
                                            const std::optional<std::string> & tenantName) {
-    std::vector<Flat*> results;  // Vector of pointers to flats
-    for (auto & flat : flats) {  // Note: We use non-const here since we're returning pointers to potentially mutable flats
+    std::vector<Flat*> results; 
+    for (auto & flat : flats) {
         bool matches = true;
 
         if (street && flat.addr.street != *street) matches = false;
@@ -32,7 +32,7 @@ std::vector<Flat*> FlatsManager::findFlats(const std::optional<std::string> & st
         }
 
         if (matches) {
-            results.push_back(&flat);  // Push back the pointer to the flat
+            results.push_back(&flat);
         }
     }
     return results;
@@ -72,6 +72,7 @@ void FlatsManager::printAllSimple () {
     }
 }
 
+// For simple terminal/command line output
 void FlatsManager::printAllFull () {
     std::cout << std::endl;
     std::cout << std::left << std::setw(40) << "Address:";
@@ -86,7 +87,6 @@ void FlatsManager::printAllFull () {
     }
 }
 
-// For simple terminal/command line output
 void FlatsManager::loadFromCSV(const std::string &filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {

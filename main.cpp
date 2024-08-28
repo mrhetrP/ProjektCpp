@@ -39,7 +39,6 @@ int main (void) {
 int main() {
     initscr(); // Initialize the screen
     cbreak(); // Disable line buffering
-    noecho(); // Disable automatic echoing of typed characters
     keypad(stdscr, TRUE); // Enable special keys like arrow keys
     curs_set(0); // Hide the cursor
 
@@ -53,9 +52,9 @@ int main() {
     keypad(menu_win, TRUE); // Enable special keys in the menu window
 
     while (true) {
-        clear(); // Clear the screen before displaying the menu
-        displayMenu(menu_win, highlight); // Display the menu
-        c = wgetch(menu_win); // Get user input
+        clear();
+        displayMenu(menu_win, highlight);
+        c = wgetch(menu_win);
 
         switch (c) {
             case KEY_UP:
@@ -66,10 +65,10 @@ int main() {
                 break;
             case 10: // Enter key
                 choice = highlight;
-                handleMenuSelection(choice, manager); // Handle the menu selection
+                handleMenuSelection(choice, manager);
                 if (choice == 7) {
                     endwin(); // End ncurses mode
-                    return 0; // Exit the program
+                    return EXIT_SUCCESS;
                 }
                 clear();
                 break;
@@ -79,5 +78,5 @@ int main() {
     }
 
     endwin(); // End ncurses mode
-    return 0; // Exit the program
+    return EXIT_SUCCESS;
 }

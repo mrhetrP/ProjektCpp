@@ -395,16 +395,18 @@ void addContract(Flat & flat) {
     getstr(birthDateStr);
     sscanf(birthDateStr, "%d.%d.%d", &bDay, &bMonth, &bYear);
 
-    mvprintw(7, 2, "Enter Street Name:");
+    mvprintw(6, 2, "Enter Tenants Address:");
+    mvprintw(7, 4, "Enter Street Name:");
     getstr(street);
-    mvprintw(8, 2, "Enter Conscription Number:");
+    mvprintw(8, 4, "Enter Conscription Number:");
     scanw("%d", &conscriptionNumber);
-    mvprintw(9, 2, "Enter Street Number:");
+    mvprintw(9, 4, "Enter Street Number:");
     getstr(streetNumber);
-    mvprintw(10, 2, "Enter City:");
+    mvprintw(10, 4, "Enter City:");
     getstr(city);
-    mvprintw(11, 2, "Enter Postcode:");
+    mvprintw(11, 4, "Enter Postcode:");
     scanw("%d", &postCode);
+    
     curs_set(0);
 
     try {
@@ -464,15 +466,16 @@ void removeContract(Flat & flat) {
     getstr(birthDateStr);
     sscanf(birthDateStr, "%d.%d.%d", &bDay, &bMonth, &bYear);
 
-    mvprintw(7, 2, "Enter Street Name:");
+    mvprintw(6, 2, "Enter Tenants Address:");
+    mvprintw(7, 4, "Enter Street Name:");
     getstr(street);
-    mvprintw(8, 2, "Enter Conscription Number:");
+    mvprintw(8, 4, "Enter Conscription Number:");
     scanw("%d", &conscriptionNumber);
-    mvprintw(9, 2, "Enter Street Number:");
+    mvprintw(9, 4, "Enter Street Number:");
     getstr(streetNumber);
-    mvprintw(10, 2, "Enter City:");
+    mvprintw(10, 4, "Enter City:");
     getstr(city);
-    mvprintw(11, 2, "Enter Postcode:");
+    mvprintw(11, 4, "Enter Postcode:");
     scanw("%d", &postCode);
 
     curs_set(0);
@@ -573,35 +576,31 @@ void listFlatsFull(const std::vector<Flat*>& flats) {
 
 void loadFromCSV(FlatsManager & manager) {
     char file[100];
-    echo(); // Enable echoing of user input
-    curs_set(1); // Show cursor to indicate input is expected
+    echo();
+    curs_set(1);
 
     mvprintw(1, 2, "Enter File Name: ");
-    getstr(file); // Get the file name from the user
+    getstr(file);
 
-    // Check if the file exists
+    noecho();
+    curs_set(0);
+
     std::ifstream infile(file);
     if (!infile) {
         clear();
         refresh();
         mvprintw(1, 2, "Error: File does not exist. Press any key to return to the menu.");
-        getch(); // Wait for the user to press a key
-        noecho(); // Disable echoing
-        curs_set(0); // Hide cursor
+        getch(); 
         clear();
         refresh();
-        return; // Exit the function, returning to the menu
+        return;
     }
 
-    // File exists, proceed with loading
     manager.loadFromCSV(file);
     clear();
     refresh();
     mvprintw(1, 2, "Flats loaded successfully! Press any key to return to the menu.");
-    getch(); // Wait for the user to press a key
-    clear(); // Clear the screen
-    noecho(); // Disable echoing of user input
-    curs_set(0); // Hide cursor
+    getch();
     clear();
     refresh();
 }
@@ -619,16 +618,15 @@ void saveToCSV(FlatsManager &manager) {
     std::regex pattern("^[\\w\\-. ]+\\.csv$");
     if (filename.empty() || !std::regex_match(filename, pattern)) {
         mvprintw(1, 2, "Error: Invalid file name!");
-        getch(); // Wait for user input before clearing the screen
+        getch();
         clear();
         return;
     }
 
-    // Assuming FlatsManager has a method to serialize its data to CSV
     manager.saveToCSV(filename);
 
     mvprintw(1, 2, "Data saved successfully to %s", file);
-    getch(); // Wait for user input before clearing the screen
+    getch();
     clear();
     refresh();
 }
@@ -680,8 +678,7 @@ void handleMenuSelection(int choice, FlatsManager & manager) {
         case 6:
             saveToCSV(manager);
             break;
-        case 7:
-            // Exit the program
+        case 7: // Exit the program
             break;
     }
 }
