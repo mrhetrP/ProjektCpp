@@ -1,17 +1,17 @@
 # include "flatsManager.hpp"
 
 void Flat::addItem(FlatsManager & manager, const Item & item) {
-    std::vector<Flat> flatsAtSameAddress = manager.findFlats(addr.street, addr.conscriptionNumber, addr.streetNumber, addr.city, addr.postCode);
-    for (const auto &flat : flatsAtSameAddress) {
-        auto it = std::find_if(flat.items.begin(), flat.items.end(), [&item](const Item &existingItem) {
-           return existingItem.id == item.id;
+    std::vector<Flat*> flatsAtSameAddress = manager.findFlats(addr.street, addr.conscriptionNumber, addr.streetNumber, addr.city, addr.postCode);
+    for (const auto &flatPtr : flatsAtSameAddress) {
+        auto it = std::find_if(flatPtr->items.begin(), flatPtr->items.end(), [&item](const Item &existingItem) {
+            return existingItem.id == item.id;
         });
-        if (it != flat.items.end()) {
+        if (it != flatPtr->items.end()) {
             throw std::invalid_argument("An item with the same ID already exists in a flat at this address");
         }
     }
     auto it = std::lower_bound(this->items.begin(), this->items.end(), item.id, [&](const Item & i, const int & id) {
-        return (i.id < item.id);
+        return i.id < id;
     });
     items.insert(it, item);
 }

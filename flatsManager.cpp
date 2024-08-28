@@ -6,15 +6,15 @@
     auto flatsInPrague = manager.findFlats(std::nullopt, std::nullopt, std::nullopt, "Prague");
     auto specificFlat = manager.findFlats("Main Street", 123, "45A", "Prague", 11000, 1);
 */
-std::vector<Flat> FlatsManager::findFlats(const std::optional<std::string> & street,
-                                          const std::optional<int> & conscriptionNumber,
-                                          const std::optional<std::string> & streetNumber,
-                                          const std::optional<std::string> & city,
-                                          const std::optional<int> & postCode,
-                                          const std::optional<int> & number,
-                                          const std::optional<std::string> & tenantName) const {
-    std::vector<Flat> results;
-    for (const auto & flat : flats) {
+std::vector<Flat*> FlatsManager::findFlats(const std::optional<std::string> & street,
+                                           const std::optional<int> & conscriptionNumber,
+                                           const std::optional<std::string> & streetNumber,
+                                           const std::optional<std::string> & city,
+                                           const std::optional<int> & postCode,
+                                           const std::optional<int> & number,
+                                           const std::optional<std::string> & tenantName) {
+    std::vector<Flat*> results;  // Vector of pointers to flats
+    for (auto & flat : flats) {  // Note: We use non-const here since we're returning pointers to potentially mutable flats
         bool matches = true;
 
         if (street && flat.addr.street != *street) matches = false;
@@ -32,11 +32,12 @@ std::vector<Flat> FlatsManager::findFlats(const std::optional<std::string> & str
         }
 
         if (matches) {
-            results.push_back(flat);
+            results.push_back(&flat);  // Push back the pointer to the flat
         }
     }
     return results;
 }
+
 
 void FlatsManager::addFlat (const Flat & flat) {
     auto it = std::lower_bound(flats.begin(), flats.end(), flat.addr, [&](const Flat & f, const Address & addr) {

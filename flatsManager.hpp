@@ -92,13 +92,13 @@ class FlatsManager {
     public:
         std::vector<Flat> flats;
         
-        std::vector<Flat> findFlats(const std::optional<std::string> & street = std::nullopt,
+        std::vector<Flat*> findFlats(const std::optional<std::string> & street = std::nullopt,
                                 const std::optional<int> & conscriptionNumber = std::nullopt,
                                 const std::optional<std::string> & streetNumber = std::nullopt,
                                 const std::optional<std::string> & city = std::nullopt,
                                 const std::optional<int> & postCode = std::nullopt,
                                 const std::optional<int> & number = std::nullopt,
-                                const std::optional<std::string> & tenantName = std::nullopt) const;
+                                const std::optional<std::string> & tenantName = std::nullopt);
         void addFlat(const Flat & flat);
         void removeFlat(const Flat & flat);
 

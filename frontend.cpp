@@ -35,7 +35,13 @@ void addFlat(FlatsManager & manager) {
                 refresh();
                 addItem(manager, manager.flats.back());
             }
-            // TO DO add contract?
+            mvprintw(3, 2, "Do you want to add contract(s)? (y/n): ");
+            response = getch();
+            if (response == 'y' || response == 'Y') {
+                clear();
+                refresh();
+                addContract(manager.flats.back());
+            }
             success = true; // Break the loop on success
             clear();
             refresh();
@@ -146,7 +152,7 @@ void findFlat(FlatsManager & manager) {
     if (foundFlats.size() > 1) {
         handleMultipleFlatsMenu(foundFlats);
     } else if (foundFlats.size() == 1) {
-        handleSingleFlatMenu(manager, foundFlats[0]);
+        handleSingleFlatMenu(manager, *foundFlats[0]);
     } else {
         mvprintw(1, 2, "No flats found.");
         getch();
@@ -155,7 +161,7 @@ void findFlat(FlatsManager & manager) {
     }
 }
 
-void handleMultipleFlatsMenu(const std::vector<Flat>& foundFlats) {
+void handleMultipleFlatsMenu(const std::vector<Flat*>& foundFlats) {
     mvprintw(1, 2, "%ld flats found", foundFlats.size());
     mvprintw(2, 2, "What do you want to do with them?");
     refresh();
@@ -273,22 +279,15 @@ void handleSingleFlatMenu(FlatsManager & manager, Flat & flat) {
             break;
         case 1: // Add item
             addItem(manager, flat);
-            mvprintw(1, 2, "Adding item...");
             break;
-        case 2:
-            // Remove item
-            mvprintw(1, 2, "Removing item...");
-            // Add code to remove item from the flat
+        case 2: // Remove item
+            removeItem(flat);
             break;
-        case 3:
-            // Add contract
-            mvprintw(1, 2, "Adding contract...");
-            // Add code to add contract to the flat
+        case 3:  // Add contract
+            addContract(flat);
             break;
-        case 4:
-            // Remove contract
-            mvprintw(1, 2, "Removing contract...");
-            // Add code to remove contract from the flat
+        case 4: // Remove contract
+            removeContract(flat);
             break;
     }
 }
@@ -299,9 +298,9 @@ void addItem(FlatsManager & manager, Flat & flat) {
 
     echo();
     curs_set(1);
-    mvprintw(3, 2, "Enter Item Name:");
+    mvprintw(1, 2, "Enter Item Name:");
     getstr(name);
-    mvprintw(4, 2, "Enter Id Number:");
+    mvprintw(2, 2, "Enter Id Number:");
     scanw("%d", &id);
     curs_set(0);
 
@@ -330,22 +329,184 @@ void addItem(FlatsManager & manager, Flat & flat) {
         clear();
         refresh();
     }
-    
 }
 
 void removeItem(Flat & flat) {
-    // code
+    int id = -1;
+    echo();
+    curs_set(1);
+    mvprintw(1, 2, "Enter Id Number:");
+    scanw("%d", &id);
+    curs_set(0);
+
+    try {
+        flat.removeItem(id);
+        clear();
+        mvprintw(1, 2, "Item removed successfully. Do you want to remove another item? (y/n):");
+        char response = getch();
+        if (response == 'y' || response == 'Y') {
+            clear();
+            refresh();
+            removeItem(flat);
+        }
+        clear();
+        refresh();
+    } catch(const std::exception& e) {
+        clear();
+        mvprintw(1, 2, "Error: %s", e.what());
+        mvprintw(3, 2, "Do you want to try again? (y/n): ");
+        char response = getch();
+        if (response == 'y' || response == 'Y') {
+            clear();
+            refresh();
+            removeItem(flat);
+        }
+        clear();
+        refresh();
+    }
 }
 
 void addContract(Flat & flat) {
-    // code
+    char startDateStr[11] = "";
+    char endDateStr[11] = "";
+    char birthDateStr[11] = "";
+    int sDay = -1, sMonth = -1, sYear = -1;
+    int eDay = -1, eMonth = -1, eYear = -1;
+    char name[50] = "";
+    int bDay = -1, bMonth = -1, bYear = -1;
+    char street[50] = "", city[50] = "", streetNumber[10] = "";
+    int conscriptionNumber = -1, postCode = -1;
+
+    echo();
+    curs_set(1);
+
+    mvprintw(1, 2, "Enter Contract Start Date (DD.MM.YYYY):");
+    getstr(startDateStr);
+    sscanf(startDateStr, "%d.%d.%d", &sDay, &sMonth, &sYear);
+
+    mvprintw(2, 2, "Enter Contract End Date (DD.MM.YYYY):");
+    getstr(endDateStr);
+    sscanf(endDateStr, "%d.%d.%d", &eDay, &eMonth, &eYear);
+
+    mvprintw(4, 2, "Enter Tenant Name:");
+    getstr(name);
+
+    mvprintw(5, 2, "Enter Tenant Birth Date (DD.MM.YYYY):");
+    getstr(birthDateStr);
+    sscanf(birthDateStr, "%d.%d.%d", &bDay, &bMonth, &bYear);
+
+    mvprintw(7, 2, "Enter Street Name:");
+    getstr(street);
+    mvprintw(8, 2, "Enter Conscription Number:");
+    scanw("%d", &conscriptionNumber);
+    mvprintw(9, 2, "Enter Street Number:");
+    getstr(streetNumber);
+    mvprintw(10, 2, "Enter City:");
+    getstr(city);
+    mvprintw(11, 2, "Enter Postcode:");
+    scanw("%d", &postCode);
+    curs_set(0);
+
+    try {
+        flat.addContract(Contract(Date(sDay, sMonth, sYear), Date(eDay, eMonth, eYear), 
+            Tenant(name, Date(bDay, bMonth, bYear), Address(street, conscriptionNumber, streetNumber, city, postCode))));
+        clear();
+        mvprintw(1, 2, "Contract added successfully. Do you want to add another item? (y/n):");
+        char response = getch();
+        if (response == 'y' || response == 'Y') {
+            clear();
+            refresh();
+            addContract(flat);
+        }
+        clear();
+        refresh();
+    } catch(const std::exception& e) {
+        clear();
+        mvprintw(1, 2, "Error: %s", e.what());
+        mvprintw(3, 2, "Do you want to try again? (y/n): ");
+        char response = getch();
+        if (response == 'y' || response == 'Y') {
+            clear();
+            refresh();
+            addContract(flat);
+        }
+        clear();
+        refresh();
+    }
 }
 
 void removeContract(Flat & flat) {
-    // code
+    char startDateStr[11] = "";
+    char endDateStr[11] = "";
+    char birthDateStr[11] = "";
+    int sDay = -1, sMonth = -1, sYear = -1;
+    int eDay = -1, eMonth = -1, eYear = -1;
+    char name[50] = "";
+    int bDay = -1, bMonth = -1, bYear = -1;
+    char street[50] = "", city[50] = "", streetNumber[10] = "";
+    int conscriptionNumber = -1, postCode = -1;
+
+    echo();
+    curs_set(1);
+
+    mvprintw(1, 2, "Enter Contract Start Date (DD.MM.YYYY):");
+    getstr(startDateStr);
+    sscanf(startDateStr, "%d.%d.%d", &sDay, &sMonth, &sYear);
+
+    mvprintw(2, 2, "Enter Contract End Date (DD.MM.YYYY):");
+    getstr(endDateStr);
+    sscanf(endDateStr, "%d.%d.%d", &eDay, &eMonth, &eYear);
+
+    mvprintw(4, 2, "Enter Tenant Name:");
+    getstr(name);
+
+    mvprintw(5, 2, "Enter Tenant Birth Date (DD.MM.YYYY):");
+    getstr(birthDateStr);
+    sscanf(birthDateStr, "%d.%d.%d", &bDay, &bMonth, &bYear);
+
+    mvprintw(7, 2, "Enter Street Name:");
+    getstr(street);
+    mvprintw(8, 2, "Enter Conscription Number:");
+    scanw("%d", &conscriptionNumber);
+    mvprintw(9, 2, "Enter Street Number:");
+    getstr(streetNumber);
+    mvprintw(10, 2, "Enter City:");
+    getstr(city);
+    mvprintw(11, 2, "Enter Postcode:");
+    scanw("%d", &postCode);
+
+    curs_set(0);
+
+    try {
+        flat.removeContract(Contract(Date(sDay, sMonth, sYear), Date(eDay, eMonth, eYear), 
+            Tenant(name, Date(bDay, bMonth, bYear), Address(street, conscriptionNumber, streetNumber, city, postCode))));
+        clear();
+        mvprintw(1, 2, "Contract added successfully. Do you want to add another item? (y/n):");
+        char response = getch();
+        if (response == 'y' || response == 'Y') {
+            clear();
+            refresh();
+            removeContract(flat);
+        }
+        clear();
+        refresh();
+    } catch(const std::exception& e) {
+        clear();
+        mvprintw(1, 2, "Error: %s", e.what());
+        mvprintw(3, 2, "Do you want to try again? (y/n): ");
+        char response = getch();
+    curs_set(0);
+        if (response == 'y' || response == 'Y') {
+            clear();
+            refresh();
+            removeContract(flat);
+        }
+        clear();
+        refresh();
+    }
 }
 
-void listFlatsSimple(std::vector<Flat> flats) {
+void listFlatsSimple(const std::vector<Flat*>& flats) {
     clear();
     refresh();
     mvprintw(1, 2, "%ld flats:", flats.size());
@@ -353,10 +514,10 @@ void listFlatsSimple(std::vector<Flat> flats) {
     mvprintw(4, 2, "%s", std::string(45, '-').c_str()); mvprintw(4, 45, "+%s", std::string(29, '-').c_str()); mvprintw(4, 65, "+%s", std::string(29, '-').c_str()); mvprintw(4, 85, "+%s", std::string(29, '-').c_str());
     int line = 5;
     for (const auto & flat : flats) {
-        mvprintw(line, 2, "%s %d/%s, %s, %d", flat.addr.street.c_str(), flat.addr.conscriptionNumber, flat.addr.streetNumber.c_str(), flat.addr.city.c_str(), flat.addr.postCode);
-        mvprintw(line, 45, "| %d", flat.number);    mvprintw(line, 65, "| %ld", flat.items.size());
-        if (!flat.contracts.empty()) {
-            mvprintw(line, 85, "| %s", flat.contracts.back().tenant.name.c_str());
+        mvprintw(line, 2, "%s %d/%s, %s, %d", flat->addr.street.c_str(), flat->addr.conscriptionNumber, flat->addr.streetNumber.c_str(), flat->addr.city.c_str(), flat->addr.postCode);
+        mvprintw(line, 45, "| %d", flat->number);    mvprintw(line, 65, "| %ld", flat->items.size());
+        if (!flat->contracts.empty()) {
+            mvprintw(line, 85, "| %s", flat->contracts.back().tenant.name.c_str());
         } else {
             mvprintw(line, 85, "| no contracts");
         }
@@ -367,7 +528,7 @@ void listFlatsSimple(std::vector<Flat> flats) {
     refresh();
 }
 
-void listFlatsFull(std::vector<Flat> flats) {
+void listFlatsFull(const std::vector<Flat*>& flats) {
     clear();
     refresh();
     mvprintw(1, 2, "%ld flats:", flats.size());
@@ -376,31 +537,34 @@ void listFlatsFull(std::vector<Flat> flats) {
     int line = 5;
     for (const auto & flat : flats) {
         // first line
-        mvprintw(line, 2, "%s %d/%s, %s, %d", flat.addr.street.c_str(), flat.addr.conscriptionNumber, flat.addr.streetNumber.c_str(), flat.addr.city.c_str(), flat.addr.postCode);
-        mvprintw(line, 45, "| %d", flat.number);
-        if (!flat.items.empty()) {
-            mvprintw(line, 62, "| %d, %s", flat.items.front().id, flat.items.front().name.c_str());
+        mvprintw(line, 2, "%s %d/%s, %s, %d", flat->addr.street.c_str(), flat->addr.conscriptionNumber, flat->addr.streetNumber.c_str(), flat->addr.city.c_str(), flat->addr.postCode);
+        mvprintw(line, 45, "| %d", flat->number);
+        if (!flat->items.empty()) {
+            mvprintw(line, 62, "| %d, %s", flat->items.front().id, flat->items.front().name.c_str());
         } else {
             mvprintw(line, 62, "| no items");
         }
-        if (!flat.contracts.empty()) {
-            mvprintw(line, 82, "| %d/%d - %d/%d %s", flat.contracts.front().startDate.month, flat.contracts.front().startDate.year, flat.contracts.front().expDate.month, flat.contracts.front().expDate.year, flat.contracts.front().tenant.name.c_str());
+        if (!flat->contracts.empty()) {
+            mvprintw(line, 82, "| %d/%d - %d/%d %s", flat->contracts.front().startDate.month, flat->contracts.front().startDate.year, flat->contracts.front().expDate.month, flat->contracts.front().expDate.year, flat->contracts.front().tenant.name.c_str());
         } else {
             mvprintw(line, 82, "| no contracts");
         }
         // other lines
-        int itemLine = line +1;
-        for (const auto & item : flat.items) {
+        int itemLine = line;
+        for (const auto & item : flat->items) {
             mvprintw(itemLine, 45, "|");
             mvprintw(itemLine, 62, "| %d, %s", item.id, item.name.c_str());
+            mvprintw(itemLine, 82, "|");
+            itemLine++;
         }
-        int contrLine = line +1;
-        for (const auto & contract : flat.contracts) {
+        int contrLine = line;
+        for (const auto & contract : flat->contracts) {
             mvprintw(contrLine, 45, "|");
+            mvprintw(contrLine, 62, "|");
             mvprintw(contrLine, 82, "| %d/%d - %d/%d %s", contract.startDate.month, contract.startDate.year, contract.expDate.month, contract.expDate.year, contract.tenant.name.c_str());
+            contrLine++;
         }
         line = itemLine > contrLine ? itemLine : contrLine;
-        if (flat.items.size() > 1 || flat.contracts.size() > 1) line++;
         mvprintw(line, 45, "|"); mvprintw(line, 62, "|"); mvprintw(line, 82, "|");
         line++;
     }
@@ -466,6 +630,7 @@ void saveToCSV(FlatsManager &manager) {
     mvprintw(1, 2, "Data saved successfully to %s", file);
     getch(); // Wait for user input before clearing the screen
     clear();
+    refresh();
 }
 
 void displayMenu(WINDOW* menu_win, int highlight) {
@@ -504,10 +669,10 @@ void handleMenuSelection(int choice, FlatsManager & manager) {
             findFlat(manager);
             break;
         case 3:
-            listFlatsSimple(manager.flats);
+            listFlatsSimple(manager.findFlats());
             break;
         case 4:
-            listFlatsFull(manager.flats);
+            listFlatsFull(manager.findFlats());
             break;
         case 5:
             loadFromCSV(manager);
