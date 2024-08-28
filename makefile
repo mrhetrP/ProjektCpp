@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS= -g -std=c++17 -Wall -Wpedantic -lncurses -fsanitize=address
+CXXFLAGS= -g -std=c++17 -Wall -Wpedantic -lncurses
 SOURCES = $(wildcard *.cpp)
 
 main: $(SOURCES) 

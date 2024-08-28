@@ -20,18 +20,23 @@ void addFlat(FlatsManager & manager) {
         scanw("%d", &postCode);
         mvprintw(6, 2, "Enter Flat Number: ");
         scanw("%d", &flatNumber);
-
+        curs_set(0);
         
         try {
             Address addr(street, conscriptionNumber, streetNumber, city, postCode);
             Flat flat(addr, flatNumber);
             manager.addFlat(flat);
             clear();
-            mvprintw(1, 2, "Flat added successfully. Press any key to return to the main menu.");
+            mvprintw(1, 2, "Flat added successfully");
+            mvprintw(3, 2, "Do you want to add item(s)? (y/n): ");
+            char response = getch();
+            if (response == 'y' || response == 'Y') {
+                clear();
+                refresh();
+                addItem(manager, manager.flats.back());
+            }
             // TO DO add contract?
-            // TO DO add item?
             success = true; // Break the loop on success
-            getch();
             clear();
             refresh();
         } catch (const std::invalid_argument& e) {
@@ -49,7 +54,6 @@ void addFlat(FlatsManager & manager) {
             clear();
             refresh();
         }
-        curs_set(0);
     }
 }
 
@@ -106,66 +110,239 @@ void removeFlat(FlatsManager & manager) {
 }
 
 void findFlat(FlatsManager & manager) {
-    char street[50], city[50], streetNumber[10], tenantName[50];
-    int conscriptionNumber, postCode, flatNumber;
-    bool success = false;
+    char street[50] = "", city[50] = "", streetNumber[10] = "", tenantName[50] = "";
+    int conscriptionNumber = -1, postCode = -1, flatNumber = -1;
 
-    while (!success) {
-        echo();
-        curs_set(1);
-        mvprintw(1, 2, "Enter flat parameters, if you want to skip a parameter just press Enter.");
-        mvprintw(3, 2, "Enter Street Name:");
-        getstr(street);
-        std::string Street(street);
-        mvprintw(4, 2, "Enter Conscription Number:");
-        scanw("%d", &conscriptionNumber);
-        mvprintw(5, 2, "Enter Street Number:");
-        getstr(streetNumber);
-        mvprintw(6, 2, "Enter City:");
-        getstr(city);
-        mvprintw(7, 2, "Enter Postcode:");
-        scanw("%d", &postCode);
-        mvprintw(8, 2, "Enter Flat Number:");
-        scanw("%d", &flatNumber);
-        mvprintw(9, 2, "Tenant Name:");
-        getstr(tenantName);
+    echo();
+    curs_set(1);
+    mvprintw(1, 2, "Enter flat parameters, if you want to skip a parameter just press Enter.");
+    mvprintw(3, 2, "Enter Street Name:");
+    getstr(street);
+    mvprintw(4, 2, "Enter Conscription Number:");
+    scanw("%d", &conscriptionNumber);
+    mvprintw(5, 2, "Enter Street Number:");
+    getstr(streetNumber);
+    mvprintw(6, 2, "Enter City:");
+    getstr(city);
+    mvprintw(7, 2, "Enter Postcode:");
+    scanw("%d", &postCode);
+    mvprintw(8, 2, "Enter Flat Number:");
+    scanw("%d", &flatNumber);
+    mvprintw(9, 2, "Tenant Name:");
+    getstr(tenantName);
+    curs_set(0);
+    
+    auto foundFlats = manager.findFlats(
+        street[0] ? std::optional<std::string>(street) : std::nullopt,
+        conscriptionNumber != -1 ? std::optional<int>(conscriptionNumber) : std::nullopt,
+        streetNumber[0] ? std::optional<std::string>(streetNumber) : std::nullopt,
+        city[0] ? std::optional<std::string>(city) : std::nullopt,
+        postCode != -1 ? std::optional<int>(postCode) : std::nullopt,
+        flatNumber != -1 ? std::optional<int>(flatNumber) : std::nullopt,
+        tenantName[0] ? std::optional<std::string>(tenantName) : std::nullopt
+    ); 
+    clear();
+    refresh();
+    if (foundFlats.size() > 1) {
+        handleMultipleFlatsMenu(foundFlats);
+    } else if (foundFlats.size() == 1) {
+        handleSingleFlatMenu(manager, foundFlats[0]);
+    } else {
+        mvprintw(1, 2, "No flats found.");
+        getch();
+        clear();
+        refresh();
+    }
+}
 
-        try {
-            auto foundFlats = manager.findFlats( Street,
-                conscriptionNumber ? std::optional<int>(conscriptionNumber) : std::nullopt,
-                streetNumber[0] ? std::optional<std::string>(streetNumber) : std::nullopt,
-                city[0] ? std::optional<std::string>(city) : std::nullopt,
-                postCode ? std::optional<int>(postCode) : std::nullopt,
-                flatNumber ? std::optional<int>(flatNumber) : std::nullopt,
-                tenantName[0] ? std::optional<std::string>(tenantName) : std::nullopt
-            );
-            Street = "Blanicka";
-            foundFlats = manager.findFlats(Street);
-            clear();
-            mvprintw(1, 2, "%ld flats found. What do you want to do with them?", foundFlats.size());
-            // TODO: Handle what to do with the found flats (display, modify, etc.)
-            success = true; // Break the loop on success
+void handleMultipleFlatsMenu(const std::vector<Flat>& foundFlats) {
+    mvprintw(1, 2, "%ld flats found", foundFlats.size());
+    mvprintw(2, 2, "What do you want to do with them?");
+    refresh();
+
+    int highlight = 0;
+    int choice = 0;
+    int c;
+    WINDOW* menu_win = newwin(10, 40, 3, 2);
+    keypad(menu_win, TRUE);
+
+    std::string choices[] = {
+        "Display Flats Simple",
+        "Display Flats Full"
+    };
+    int n_choices = sizeof(choices) / sizeof(choices[0]);
+
+    while (true) {
+        for (int i = 0; i < n_choices; ++i) {
+            if (i == highlight) {
+                wattron(menu_win, A_REVERSE);
+            }
+            mvwprintw(menu_win, i + 1, 1, "%s", choices[i].c_str());
+            wattroff(menu_win, A_REVERSE);
+        }
+        wrefresh(menu_win);
+
+        c = wgetch(menu_win);
+
+        switch (c) {
+            case KEY_UP:
+                if (highlight > 0) --highlight;
+                break;
+            case KEY_DOWN:
+                if (highlight < n_choices - 1) ++highlight;
+                break;
+            case 10: // Enter key
+                choice = highlight;
+                break;
+            default:
+                break;
+        }
+
+        if (c == 10) break;
+    }
+
+    clear();
+    refresh();
+
+    if (choice == 0) {
+        listFlatsSimple(foundFlats);
+    } else if (choice == 1) {
+        listFlatsFull(foundFlats);
+    }
+}
+
+void handleSingleFlatMenu(FlatsManager & manager, Flat & flat) {
+    mvprintw(1, 2, "1 flat found");
+    mvprintw(2, 2, "What do you want to do with it?");
+    refresh();
+
+    int highlight = 0;
+    int choice = 0;
+    int c;
+    WINDOW* menu_win = newwin(10, 40, 3, 2);
+    keypad(menu_win, TRUE);
+
+    std::string choices[] = {
+        "Remove Flat",
+        "Add Item",
+        "Remove Item",
+        "Add Contract",
+        "Remove Contract"
+    };
+    int n_choices = sizeof(choices) / sizeof(choices[0]);
+
+    while (true) {
+        for (int i = 0; i < n_choices; ++i) {
+            if (i == highlight) {
+                wattron(menu_win, A_REVERSE);
+            }
+            mvwprintw(menu_win, i + 1, 1, "%s", choices[i].c_str());
+            wattroff(menu_win, A_REVERSE);
+        }
+        wrefresh(menu_win);
+
+        c = wgetch(menu_win);
+
+        switch (c) {
+            case KEY_UP:
+                if (highlight > 0) --highlight;
+                break;
+            case KEY_DOWN:
+                if (highlight < n_choices - 1) ++highlight;
+                break;
+            case 10: // Enter key
+                choice = highlight;
+                break;
+            default:
+                break;
+        }
+
+        if (c == 10) break;
+    }
+
+    clear();
+    refresh();
+
+    switch (choice) {
+        case 0: // Remove flat
+            manager.removeFlat(flat);
+            mvprintw(1, 2, "Flat removed successfully. Press any key to return to the main menu.");
             getch();
             clear();
             refresh();
-        } catch (const std::exception &e) {
-            clear();
-            refresh();
-            mvprintw(3, 2, "Error: %s", e.what());
-            mvprintw(5, 2, "Do you want to try again? (y/n): ");
-            char response = getch();
-            if (response != 'y' && response != 'Y') {
-                clear();
-                refresh();
-                mvprintw(1, 2, "Operation cancelled. Press any key to return to the main menu.");
-                getch();
-                success = true; // Break the loop to exit
-            }
-            clear();
-            refresh();
-        }
-        curs_set(0);
+            break;
+        case 1: // Add item
+            addItem(manager, flat);
+            mvprintw(1, 2, "Adding item...");
+            break;
+        case 2:
+            // Remove item
+            mvprintw(1, 2, "Removing item...");
+            // Add code to remove item from the flat
+            break;
+        case 3:
+            // Add contract
+            mvprintw(1, 2, "Adding contract...");
+            // Add code to add contract to the flat
+            break;
+        case 4:
+            // Remove contract
+            mvprintw(1, 2, "Removing contract...");
+            // Add code to remove contract from the flat
+            break;
     }
+}
+
+void addItem(FlatsManager & manager, Flat & flat) {
+    char name[50] = "";
+    int id = -1;
+
+    echo();
+    curs_set(1);
+    mvprintw(3, 2, "Enter Item Name:");
+    getstr(name);
+    mvprintw(4, 2, "Enter Id Number:");
+    scanw("%d", &id);
+    curs_set(0);
+
+    try {
+        flat.addItem(manager, Item(name, id));
+        clear();
+        mvprintw(1, 2, "Item added successfully. Do you want to add another item? (y/n):");
+        char response = getch();
+        if (response == 'y' || response == 'Y') {
+            clear();
+            refresh();
+            addItem(manager, flat);
+        }
+        clear();
+        refresh();
+    } catch(const std::exception& e) {
+        clear();
+        mvprintw(1, 2, "Error: %s", e.what());
+        mvprintw(3, 2, "Do you want to try again? (y/n): ");
+        char response = getch();
+        if (response == 'y' || response == 'Y') {
+            clear();
+            refresh();
+            addItem(manager, flat);
+        }
+        clear();
+        refresh();
+    }
+    
+}
+
+void removeItem(Flat & flat) {
+    // code
+}
+
+void addContract(Flat & flat) {
+    // code
+}
+
+void removeContract(Flat & flat) {
+    // code
 }
 
 void listFlatsSimple(std::vector<Flat> flats) {
@@ -245,9 +422,10 @@ void loadFromCSV(FlatsManager & manager) {
         refresh();
         mvprintw(1, 2, "Error: File does not exist. Press any key to return to the menu.");
         getch(); // Wait for the user to press a key
-        clear(); // Clear the screen
         noecho(); // Disable echoing
         curs_set(0); // Hide cursor
+        clear();
+        refresh();
         return; // Exit the function, returning to the menu
     }
 
