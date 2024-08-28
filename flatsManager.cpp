@@ -57,6 +57,7 @@ void FlatsManager::removeFlat (const Flat & flat) {
     } else throw std::invalid_argument("Flat does not exist");
 }
 
+// For simple terminal/command line output
 void FlatsManager::printAllSimple () {
     std::cout << std::endl;
     std::cout << std::left << std::setw(40) << "Address:";
@@ -84,6 +85,7 @@ void FlatsManager::printAllFull () {
     }
 }
 
+// For simple terminal/command line output
 void FlatsManager::loadFromCSV(const std::string &filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {

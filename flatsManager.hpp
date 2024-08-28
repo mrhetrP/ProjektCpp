@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <optional>
+#include <regex>
 
 struct Date {
     int year; // must be between 2000 and 2100

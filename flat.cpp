@@ -61,6 +61,8 @@ void Flat::removeContract(const Contract &contract) {
     }
 }
 
+
+// For simple terminal/command line output
 void Flat::simpleDescription() const {
     std::cout << std::left << std::setw(40) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
         + this->addr.streetNumber + ", " + this->addr.city + ", " + std::to_string(this->addr.postCode));
@@ -74,6 +76,7 @@ void Flat::simpleDescription() const {
     std::cout << std::endl;
 }
 
+// For simple terminal/command line output
 void Flat::fullDescription() const {
     // First line
     std::cout << std::left << std::setw(40) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
