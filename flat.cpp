@@ -1,6 +1,7 @@
 # include "flatsManager.hpp"
 
-void Flat::addItem(FlatsManager & manager, const Item & item) {
+void Flat::addItem(FlatsManager &manager, const Item &item) {
+    // Check for existing item ID in flats at the same address
     std::vector<Flat*> flatsAtSameAddress = manager.findFlats(addr.street, addr.conscriptionNumber, addr.streetNumber, addr.city, addr.postCode);
     for (const auto &flatPtr : flatsAtSameAddress) {
         auto it = std::find_if(flatPtr->items.begin(), flatPtr->items.end(), [&item](const Item &existingItem) {
@@ -10,13 +11,16 @@ void Flat::addItem(FlatsManager & manager, const Item & item) {
             throw std::invalid_argument("An item with the same ID already exists in a flat at this address");
         }
     }
-    auto it = std::lower_bound(this->items.begin(), this->items.end(), item.id, [&](const Item & i, const int & id) {
+
+    // Insert item in sorted order
+    auto it = std::lower_bound(this->items.begin(), this->items.end(), item.id, [&](const Item &i, const int &id) {
         return i.id < id;
     });
     items.insert(it, item);
 }
 
 void Flat::removeItem(int id) {
+    // Find and remove item by ID
     auto it = std::find_if(items.begin(), items.end(), [id](const Item& item) {
         return item.id == id;
     });
@@ -27,30 +31,33 @@ void Flat::removeItem(int id) {
     }
 }
 
-void Flat::addContract(const Contract & contract) {
+void Flat::addContract(const Contract &contract) {
     if (contract.expDate < contract.startDate) {
         throw std::invalid_argument("New contract expDate is earlier than startDate");
     }
+
+    // Insert contract in sorted order by start date
     auto it = std::lower_bound(this->contracts.begin(), this->contracts.end(), contract.startDate, 
-        [](const Contract & c, const Date & date) {
+        [](const Contract &c, const Date &date) {
             return c.startDate < date;
         });
-    // Check if there's a previous contract and if the startDate overlaps with the previous contract's expDate
+
+    // Ensure no overlap with previous or next contracts
     if (it != this->contracts.begin()) {
         auto prevContract = std::prev(it);
         if (contract.startDate < prevContract->expDate) {
             throw std::invalid_argument("New contract startDate overlaps with the previous contract's expDate");
         }
     }
-    if (it != contracts.end()) {
-        if (it->startDate < contract.expDate) {
-            throw std::invalid_argument("New contract expDate overlaps with next contract startDate");
-        }
+    if (it != contracts.end() && it->startDate < contract.expDate) {
+        throw std::invalid_argument("New contract expDate overlaps with next contract startDate");
     }
+
     contracts.insert(it, contract);
 }
 
 void Flat::removeContract(const Contract &contract) {
+    // Find and remove contract
     auto it = std::find_if(contracts.begin(), contracts.end(), [&](const Contract &c) {
         return c == contract;
     });
@@ -62,7 +69,7 @@ void Flat::removeContract(const Contract &contract) {
 }
 
 
-// For simple terminal/command line output
+// For simple terminal output
 void Flat::simpleDescription() const {
     std::cout << std::left << std::setw(40) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
         + this->addr.streetNumber + ", " + this->addr.city + ", " + std::to_string(this->addr.postCode));
@@ -76,12 +83,13 @@ void Flat::simpleDescription() const {
     std::cout << std::endl;
 }
 
-// For simple terminal/command line output
+// For simple terminal output
 void Flat::fullDescription() const {
     // First line
     std::cout << std::left << std::setw(40) << (this->addr.street + " " + std::to_string(this->addr.conscriptionNumber) + "/"
         + this->addr.streetNumber + ", " + this->addr.city + ", " + std::to_string(this->addr.postCode));
     std::cout << std::left << std::setw(17) << ("| " + std::to_string(this->number));
+
     if (!this->items.empty() && !this->contracts.empty()) {
         std::cout << std::left << std::setw(20) << ("| " + std::to_string(this->items.front().id) + ", " + this->items.front().name);
         std::cout << std::left << std::setw(35) << ("| " + std::to_string(this->contracts.front().startDate.month) + "/" + std::to_string(this->contracts.front().startDate.year)
