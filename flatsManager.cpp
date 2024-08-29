@@ -6,15 +6,15 @@
     auto flatsInPrague = manager.findFlats(std::nullopt, std::nullopt, std::nullopt, "Prague");
     auto specificFlat = manager.findFlats("Main Street", 123, "45A", "Prague", 11000, 1);
 */
-std::vector<Flat*> FlatsManager::findFlats(const std::optional<std::string> & street,
-                                           const std::optional<int> & conscriptionNumber,
-                                           const std::optional<std::string> & streetNumber,
-                                           const std::optional<std::string> & city,
-                                           const std::optional<int> & postCode,
-                                           const std::optional<int> & number,
-                                           const std::optional<std::string> & tenantName) {
+std::vector<Flat*> FlatsManager::findFlats(const std::optional<std::string> &street,
+                                           const std::optional<int> &conscriptionNumber,
+                                           const std::optional<std::string> &streetNumber,
+                                           const std::optional<std::string> &city,
+                                           const std::optional<int> &postCode,
+                                           const std::optional<int> &number,
+                                           const std::optional<std::string> &tenantName) {
     std::vector<Flat*> results; 
-    for (auto & flat : flats) {
+    for (auto &flat : flats) {
         bool matches = true;
 
         if (street && flat.addr.street != *street) matches = false;
@@ -25,7 +25,7 @@ std::vector<Flat*> FlatsManager::findFlats(const std::optional<std::string> & st
         if (number && flat.number != *number) matches = false;
         if (tenantName) {
             if (!flat.contracts.empty()) {
-                if (tenantName && flat.contracts.back().tenant.name != *tenantName) matches = false;
+                if (flat.contracts.back().tenant.name != *tenantName) matches = false;
             } else {
                 matches = false;
             }
@@ -38,9 +38,8 @@ std::vector<Flat*> FlatsManager::findFlats(const std::optional<std::string> & st
     return results;
 }
 
-
-void FlatsManager::addFlat (const Flat & flat) {
-    auto it = std::lower_bound(flats.begin(), flats.end(), flat.addr, [&](const Flat & f, const Address & addr) {
+void FlatsManager::addFlat(const Flat &flat) {
+    auto it = std::lower_bound(flats.begin(), flats.end(), flat.addr, [&](const Flat &f, const Address &addr) {
         return (f.addr < flat.addr || f.number < flat.number);
     });
     if (it != flats.end() && it->addr == flat.addr && it->number == flat.number) {
@@ -49,17 +48,19 @@ void FlatsManager::addFlat (const Flat & flat) {
     flats.insert(it, flat);
 }
 
-void FlatsManager::removeFlat (const Flat & flat) {
-    auto it = std::lower_bound(flats.begin(), flats.end(), flat.addr, [&](const Flat & f, const Address & addr) {
+void FlatsManager::removeFlat(const Flat &flat) {
+    auto it = std::lower_bound(flats.begin(), flats.end(), flat.addr, [&](const Flat &f, const Address &addr) {
         return (f.addr < flat.addr || f.number < flat.number);
     });
-    if (it != flats.end() && it->addr == flat.addr && it->number == flat.number){
+    if (it != flats.end() && it->addr == flat.addr && it->number == flat.number) {
         flats.erase(it);
-    } else throw std::invalid_argument("Flat does not exist");
+    } else {
+        throw std::invalid_argument("Flat does not exist");
+    }
 }
 
 // For simple terminal/command line output
-void FlatsManager::printAllSimple () {
+void FlatsManager::printAllSimple() {
     std::cout << std::endl;
     std::cout << std::left << std::setw(40) << "Address:";
     std::cout << std::left << std::setw(20) << "| Flat number:";
@@ -67,13 +68,13 @@ void FlatsManager::printAllSimple () {
     std::cout << std::left << std::setw(20) << "| Latest tenant:";
     std::cout << std::endl;
     std::cout << std::string(40, '-') + "+" + std::string(19, '-') + "+" + std::string(19, '-') + "+" + std::string(19, '-') << std::endl;
-    for (const auto & flat : flats) {
+    for (const auto &flat : flats) {
         flat.simpleDescription();
     }
 }
 
 // For simple terminal/command line output
-void FlatsManager::printAllFull () {
+void FlatsManager::printAllFull() {
     std::cout << std::endl;
     std::cout << std::left << std::setw(40) << "Address:";
     std::cout << std::left << std::setw(17) << "| Flat number:";
@@ -81,7 +82,7 @@ void FlatsManager::printAllFull () {
     std::cout << std::left << std::setw(35) << "| Contracts";
     std::cout << std::endl;
     std::cout << std::string(40, '-') + "+" + std::string(16, '-') + "+" + std::string(19, '-') + "+" + std::string(34, '-') << std::endl;
-    for (const auto & flat : flats) {
+    for (const auto &flat : flats) {
         flat.fullDescription();
         std::cout << std::endl;
     }
@@ -132,7 +133,7 @@ void FlatsManager::loadFromCSV(const std::string &filename) {
         std::getline(lineStream, token, ',');
         if (!token.empty() && token[0] == '\"') token = token.substr(1, token.size() - 2);
         std::stringstream contractsStream(token);
-        std::string contractToken = "";
+        std::string contractToken;
         while (std::getline(contractsStream, contractToken, ';')) {
             std::stringstream contractStream(contractToken);
             int sy, sm, sd, ey, em, ed;

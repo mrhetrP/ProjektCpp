@@ -16,46 +16,39 @@ Date::Date(int y, int m, int d) {
 }
 
 bool Date::operator<(const Date &other) const {
-    if (year < other.year) {
-        return true;
-    } else if (year > other.year) {
-        return false;
+    if (year != other.year) {
+        return year < other.year;
     } 
-    if (month < other.month) {
-        return true;
-    } else if (month > other.month) {
-        return false;
-    } 
+    if (month != other.month) {
+        return month < other.month;
+    }
     return day < other.day;
 }
 
 bool Date::operator==(const Date &other) const {
-    if (year == other.year && month == other.month && day == other.day) {
-        return true;
-    }
-    return false;
+    return year == other.year && month == other.month && day == other.day;
 }
 
 int Date::daysInMonth(int month, int year) {
     if (month == 2) { // February
-        return (isLeapYear(year) ? 29 : 28);
+        return isLeapYear(year) ? 29 : 28;
     }
-    if (month == 4 || month == 6 || month == 9 || month == 11) {    // Months with 30 days
+    if (month == 4 || month == 6 || month == 9 || month == 11) { // 30-day months
         return 30;
     }
-    return 31;  // Months with 31 days
+    return 31; // 31-day months
 }
 
 bool Date::isLeapYear(int year) {
     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
 }
 
-Address::Address (const std::string & street, int conscriptionNumber, const std::string & streetNumber, const std::string & city, int postCode) {
+Address::Address(const std::string &street, int conscriptionNumber, const std::string &streetNumber, const std::string &city, int postCode) {
     if (!isValidStreetNumber(streetNumber)) {
         throw std::invalid_argument("Street number must be a number or a number followed by a letter.");
     }
     if (postCode < 10000 || postCode > 99999) {
-        throw std::invalid_argument("Post code must be in formate nnnnn.");
+        throw std::invalid_argument("Post code must be in format nnnnn.");
     }
     this->street = street;
     this->conscriptionNumber = conscriptionNumber;
@@ -85,10 +78,10 @@ bool Address::operator<(const Address &other) const {
     return postCode < other.postCode;
 }
 
-bool Address::operator==(const Address & other) const {
+bool Address::operator==(const Address &other) const {
     return street == other.street &&
-               conscriptionNumber == other.conscriptionNumber &&
-               streetNumber == other.streetNumber &&
-               city == other.city &&
-               postCode == other.postCode;
+           conscriptionNumber == other.conscriptionNumber &&
+           streetNumber == other.streetNumber &&
+           city == other.city &&
+           postCode == other.postCode;
 }
