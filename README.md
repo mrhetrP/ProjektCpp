@@ -1,5 +1,4 @@
 Kód pro správnou kompilaci vyžaduje verzi c++ kompilátoru 14.0.2 a nainstalovanou knihovnu "ncurses".
-odkaz na GitHub s verzováním změn: 
 
 semestrální projekt CPP 2024 - Petr Doležal
 
