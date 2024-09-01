@@ -1,0 +1,4 @@
+street,conscriptionNumber,streetNumber,city,postCode,number,items,contracts
+Bratri Synku,1256,123A,Nove Mesto,12345,1,"desk:1",""
+Blanicka,1257,123B,Prag,12346,2,"yz:12;xy:15","2015-5-12:2015-5-12:Antonín Novák:2015-5-12:Blanicka.1256.123A.Prag.12345;2016-3-12:2016-5-12:Dobromila Wagenknechtová:2015-5-12:Blanicka.1256.123A.Prag.12345"
+Blanicka,1256,123C,Prag,12345,3,"yz:12;xy:15;chair:16",""
